@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.5'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.sonarqube' version '3.5.0.2730'
+}
+
+java {
+    sourceCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Web
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Jpa
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    // Mapstruct
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    // Bcrypt
+    implementation 'org.springframework.security:spring-security-crypto:6.2.4'
+    // Security
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+compileJava {
+    options.compilerArgs = [
+            "-parameters",
+            "-Amapstruct.suppressGeneratorTimestamp=true",
+            "-Amapstruct.defaultComponentModel=spring",
+            "-Amapstruct.verbose=true"
+    ]
+}
