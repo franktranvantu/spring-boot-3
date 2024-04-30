@@ -1,5 +1,7 @@
 package com.franktranvantu.springboot3.dto.request;
 
+import com.franktranvantu.springboot3.validator.Birthdate;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,9 +18,11 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateRequest {
+    @Size(min = 4, message = "Password must be at least {min} characters")
     String password;
     String firstName;
     String lastName;
+    @Birthdate(min = 18)
     LocalDate dob;
     Set<String> roles;
 }
