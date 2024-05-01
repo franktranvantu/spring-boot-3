@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
+@Table(name = "users")
 @Data
 @Builder
 @NoArgsConstructor

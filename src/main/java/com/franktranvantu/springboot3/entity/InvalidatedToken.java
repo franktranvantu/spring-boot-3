@@ -2,6 +2,7 @@ package com.franktranvantu.springboot3.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +13,7 @@ import lombok.experimental.FieldDefaults;
 import java.util.Date;
 
 @Entity
+@Table(name = "invalidated_tokens")
 @Data
 @Builder
 @NoArgsConstructor

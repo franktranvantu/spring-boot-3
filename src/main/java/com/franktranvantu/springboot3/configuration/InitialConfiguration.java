@@ -4,18 +4,22 @@ import com.franktranvantu.springboot3.entity.User;
 import com.franktranvantu.springboot3.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 
 @Configuration
-@Profile("!unit-test")
 @Slf4j
 public class InitialConfiguration {
     @Bean
+    @ConditionalOnProperty(
+            prefix = "spring",
+            value = "datasource.driverClassName",
+            havingValue = "com.mysql.cj.jdbc.Driver"
+    )
     public ApplicationRunner runner(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder
@@ -29,7 +33,27 @@ public class InitialConfiguration {
                         .dateOfBirth(LocalDate.now())
                         .build();
                 userRepository.save(admin);
-                log.warn("The admin user was created automatically by the system with username and password: admin/admin. Please update the password if needed.");
+                log.info("The admin user was created automatically by the system with username and password: admin/admin. Please update the password if needed.");
+            }
+            if (userRepository.findUserByUsername("user1").isEmpty()) {
+                final var user1 = User.builder()
+                        .username("user1")
+                        .password(passwordEncoder.encode("pass"))
+                        .firstName("User 1")
+                        .dateOfBirth(LocalDate.now())
+                        .build();
+                userRepository.save(user1);
+                log.info("The user1 user was created automatically by the system with username and password: user1/pass. Please update the password if needed.");
+            }
+            if (userRepository.findUserByUsername("user2").isEmpty()) {
+                final var user2 = User.builder()
+                        .username("user2")
+                        .password(passwordEncoder.encode("pass"))
+                        .firstName("User 2")
+                        .dateOfBirth(LocalDate.now())
+                        .build();
+                userRepository.save(user2);
+                log.info("The user2 user was created automatically by the system with username and password: user2/pass. Please update the password if needed.");
             }
         };
     }

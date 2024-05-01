@@ -6,6 +6,7 @@ server:
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/identity_service
+    driverClassName: "com.mysql.cj.jdbc.Driver"
     username: root
     password: root
   jpa:
@@ -16,10 +17,10 @@ spring:
 jwt:
   signerKey: "gTWFWOUfj5ujOpkXxZziYEC0r6tiyvasmwjicIZ6ER+pTMk3gFk2Uljx7tztIh0y"
   tokens:
-    adminToken: <token>
-    user1Token: <token>
-    user2Token: <token>
-    invalidToken: <token>
+    adminToken: "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInNjb3BlIjoiUk9MRV9BRE1JTiBSRUpFQ1RfUE9TVCBBUFBST1ZFX1BPU1QgQ1JFQVRFX1BPU1QiLCJpc3MiOiJmcmFua3RyYW52YW50dS5jb20iLCJleHAiOjE3MTQ1ODYxMDcsImlhdCI6MTcxNDU4MjUwNywianRpIjoiNDFiOWI3ZTMtYjY2Ny00ZDM1LTg4ZjUtMTc3MWU3NzNmNDY1In0.Jcujwf6UNoz6y3z7FHaIEoELo1ciBhkuaYmH03WzrfoTDpZsW-Po_b-555HBjBkfiH4vOi5lDzGBm0J7FQSuQg"
+    user1Token: "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMSIsInNjb3BlIjoiUk9MRV9VU0VSIENSRUFURV9QT1NUIiwiaXNzIjoiZnJhbmt0cmFudmFudHUuY29tIiwiZXhwIjoxNzE0NTg2MTMwLCJpYXQiOjE3MTQ1ODI1MzAsImp0aSI6ImY3OWRkZWUzLTY4MDgtNDY5My04NjMyLWM3OWQ0MWYyMThjOSJ9.v9LTonT8raYc5d-z5H753C2F661ssNsTlpLq2E9UJ5BtKsGbCERqBRJm7vaj7gY6qoH083Y0qMf-qOvmoOfikA"
+    user2Token: "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMiIsInNjb3BlIjoiUk9MRV9VU0VSIENSRUFURV9QT1NUIiwiaXNzIjoiZnJhbmt0cmFudmFudHUuY29tIiwiZXhwIjoxNzE0NTg2MTQ4LCJpYXQiOjE3MTQ1ODI1NDgsImp0aSI6Ijg2NTg1MDczLTZmZDQtNGFkZi1hYWQwLWY0MmNmM2E1NjM5OCJ9.BcXME10-oywVYS8GksRNgHRTlKRG2b-HVYdQCdTpEeYFxyBSrQWoFUPeovP5B9clc_IQU-2eJwFAVD-6pXIVBw"
+    invalidToken: "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwic2NvcGUiOiJST0xFX1VTRVIgQ1JFQVRFX1BPU1QiLCJpc3MiOiJmcmFua3RyYW52YW50dS5jb20iLCJleHAiOjE3MTQ1ODE5MzgsImlhdCI6MTcxNDU3ODMzOCwianRpIjoiN2Q3MzQwN2YtNDQxMi00ZTk1LWJkM2ItZWQzNzkyZTI4MmJmIn0.yjgyijPnHXgTqTazldP74EvN9TwxDWqYSyIGCbsoNqxGxy4PeiibBva4D9P-PY-7XzT3tkHXJOeqZw6LuGziTw"
 params:
   user1Id: "95b81180-10db-4994-aa2b-4ccbdbdc6af7"
   user2Id: "75707056-0ab2-45d2-a912-5e15f068c94a"
