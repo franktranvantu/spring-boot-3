@@ -117,7 +117,7 @@ public class AuthenticationService {
             return signedJWT;
         } catch (JOSEException | ParseException e) {
             log.error("Cannot sign or parse token", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(INVALID_TOKEN);
         }
     }
 

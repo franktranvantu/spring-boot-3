@@ -8,6 +8,7 @@ import com.franktranvantu.springboot3.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -20,6 +21,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -27,6 +30,16 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("unit-test")
 class UserControllerTest {
     private static ObjectMapper objectMapper;
+    @Value("${jwt.adminToken}")
+    private String adminToken;
+    @Value("${jwt.user1Token}")
+    private String user1Token;
+    @Value("${jwt.user2Token}")
+    private String user2Token;
+    @Value("${user1Id}")
+    private String user1Id;
+    @Value("${user2Id}")
+    private String user2Id;
     @Autowired
     private MockMvc underTest;
     @MockBean
@@ -39,7 +52,7 @@ class UserControllerTest {
     }
 
     @Test
-    void givenValidRequest_whenCreateUser_thenSuccess() throws Exception {
+    void givenValidRequest_whenCreateUser_then200() throws Exception {
         final var request = UserCreationRequest
                 .builder()
                 .username("user1")
@@ -66,7 +79,7 @@ class UserControllerTest {
     }
 
     @Test
-    void givenInvalidUsernameRequest_whenCreateUser_thenFail() throws Exception {
+    void givenInvalidUsernameRequest_whenCreateUser_then400() throws Exception {
         final var request = UserCreationRequest
                 .builder()
                 .username("us")
@@ -87,7 +100,7 @@ class UserControllerTest {
     }
 
     @Test
-    void givenInvalidPasswordRequest_whenCreateUser_thenFail() throws Exception {
+    void givenInvalidPasswordRequest_whenCreateUser_then400() throws Exception {
         final var request = UserCreationRequest
                 .builder()
                 .username("user1")
@@ -108,7 +121,7 @@ class UserControllerTest {
     }
 
     @Test
-    void givenInvalidBirthdateRequest_whenCreateUser_thenFail() throws Exception {
+    void givenInvalidBirthdateRequest_whenCreateUser_then400() throws Exception {
         final var request = UserCreationRequest
                 .builder()
                 .username("user1")
@@ -129,11 +142,82 @@ class UserControllerTest {
     }
 
     @Test
-    void getUsers() {
+    void givenAdminToken_whenGetUsers_then200() throws Exception {
+        underTest
+                .perform(
+                        MockMvcRequestBuilders
+                                .get("/users")
+                                .header("Authorization", adminToken)
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(2000));
+
+        verify(userService).getUsers();
     }
 
     @Test
-    void getUser() {
+    void givenUser1Token_whenGetUsers_then403() throws Exception {
+        underTest
+                .perform(
+                        MockMvcRequestBuilders
+                                .get("/users")
+                                .header("Authorization", user1Token)
+                )
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(4003))
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("You do not have permission"));
+
+        verify(userService, never()).getUsers();
+    }
+
+
+
+    @Test
+    void givenAdminToken_whenGetUser_then200() throws Exception {
+        when(userService.getUser(user1Id)).thenReturn(UserResponse.builder().username("user1").build());
+
+        underTest
+                .perform(
+                        MockMvcRequestBuilders
+                                .get("/users/{userId}", user1Id)
+                                .header("Authorization", adminToken)
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(2000));
+
+        verify(userService).getUser(user1Id);
+    }
+
+    @Test
+    void givenUser1Token_whenGetUser_then200() throws Exception {
+        when(userService.getUser(user1Id)).thenReturn(UserResponse.builder().username("user1").build());
+
+        underTest
+                .perform(
+                        MockMvcRequestBuilders
+                                .get("/users/{userId}", user1Id)
+                                .header("Authorization", user1Token)
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(2000));
+
+        verify(userService).getUser(user1Id);
+    }
+
+    @Test
+    void givenUser2Token_whenGetUser_then403() throws Exception {
+        when(userService.getUser(user1Id)).thenReturn(UserResponse.builder().username("user1").build());
+
+        underTest
+                .perform(
+                        MockMvcRequestBuilders
+                                .get("/users/{userId}", user1Id)
+                                .header("Authorization", user2Token)
+                )
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(4003));
+
+        verify(userService).getUser(user1Id);
     }
 
     @Test

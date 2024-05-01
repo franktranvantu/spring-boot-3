@@ -53,7 +53,10 @@ public class UserService {
     }
 
     public UserResponse getUser(String userId) {
-        return userRepository.findById(userId).map(userMapper::toUserResponse).orElseThrow(() -> new ServiceException(USER_NOT_FOUND));
+        return userRepository
+                .findById(userId)
+                .map(userMapper::toUserResponse)
+                .orElseThrow(() -> new ServiceException(USER_NOT_FOUND));
     }
 
     public UserResponse updateUser(String userId, UserUpdateRequest request) {

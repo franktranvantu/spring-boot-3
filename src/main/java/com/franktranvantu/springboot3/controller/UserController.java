@@ -41,13 +41,13 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    @PostAuthorize("returnObject.username == authentication.name")
+    @PostAuthorize("returnObject.result.username == authentication.name || hasRole('ADMIN')")
     public ServiceResponse<UserResponse> getUser(@PathVariable String userId) {
         return ServiceResponse.ok(userService.getUser(userId));
     }
 
     @PutMapping("/{userId}")
-//    @PostAuthorize("returnObject.username == authentication.name")
+    @PostAuthorize("returnObject.result.username == authentication.name || hasRole('ADMIN')")
     public ServiceResponse<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
         return ServiceResponse.ok(userService.updateUser(userId, request));
     }
