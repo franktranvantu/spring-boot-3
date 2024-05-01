@@ -3,6 +3,7 @@ package com.franktranvantu.springboot3.service;
 import com.franktranvantu.springboot3.dto.request.AuthenticationRequest;
 import com.franktranvantu.springboot3.dto.request.IntrospectRequest;
 import com.franktranvantu.springboot3.dto.request.LogoutRequest;
+import com.franktranvantu.springboot3.dto.request.RefreshTokenRequest;
 import com.franktranvantu.springboot3.dto.response.AuthenticationResponse;
 import com.franktranvantu.springboot3.dto.response.IntrospectResponse;
 import com.franktranvantu.springboot3.entity.InvalidatedToken;
@@ -121,8 +122,28 @@ public class AuthenticationService {
     }
 
     public void logout(LogoutRequest request) {
+        final var signedJWT = verifyToken(request.getToken());
+        invalidateToken(signedJWT);
+    }
+
+    public AuthenticationResponse refresh(RefreshTokenRequest request) {
         try {
             final var signedJWT = verifyToken(request.getToken());
+            invalidateToken(signedJWT);
+            final var username = signedJWT.getJWTClaimsSet().getSubject();
+            final var user = userRepository.findUserByUsername(username).orElseThrow(() -> new ServiceException(USER_NOT_FOUND));
+            return AuthenticationResponse.builder()
+                    .authenticated(true)
+                    .token(generateJwtToken(user))
+                    .build();
+        } catch (ParseException e) {
+            log.error("Cannot parse token", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void invalidateToken(SignedJWT signedJWT) {
+        try {
             final var jwtId = signedJWT.getJWTClaimsSet().getJWTID();
             final var expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
             final var invalidatedToken = InvalidatedToken.builder()

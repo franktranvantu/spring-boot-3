@@ -17,15 +17,15 @@ public enum ServiceStatusCode {
     UNAUTHENTICATED(4001, HttpStatus.UNAUTHORIZED, "You are not authenticated"),
     UNAUTHORIZED(4003, HttpStatus.FORBIDDEN, "You do not have permission"),
 
-    USER_INVALID_REQUEST(4001, HttpStatus.BAD_REQUEST),
-    USER_EXISTED(4002, HttpStatus.BAD_REQUEST, "The user already existed"),
-    USER_NOT_FOUND(4003, HttpStatus.NOT_FOUND, "The user not found"),
+    USER_INVALID_REQUEST(4101, HttpStatus.BAD_REQUEST),
+    USER_EXISTED(4102, HttpStatus.BAD_REQUEST, "The user already existed"),
+    USER_NOT_FOUND(4103, HttpStatus.NOT_FOUND, "The user not found"),
 
-    ROLE_EXISTED(4011, HttpStatus.BAD_REQUEST, "The role already existed"),
-    ROLE_NOT_FOUND(4012, HttpStatus.NOT_FOUND, "The role not found"),
+    ROLE_EXISTED(4201, HttpStatus.BAD_REQUEST, "The role already existed"),
+    ROLE_NOT_FOUND(4202, HttpStatus.NOT_FOUND, "The role not found"),
 
-    PERMISSION_EXISTED(4021, HttpStatus.BAD_REQUEST, "The permission already existed"),
-    PERMISSION_NOT_FOUND(4022, HttpStatus.NOT_FOUND, "The permission not found"),
+    PERMISSION_EXISTED(4301, HttpStatus.BAD_REQUEST, "The permission already existed"),
+    PERMISSION_NOT_FOUND(4302, HttpStatus.NOT_FOUND, "The permission not found"),
     ;
 
     final int code;

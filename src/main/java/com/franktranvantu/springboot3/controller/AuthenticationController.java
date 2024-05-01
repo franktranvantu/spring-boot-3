@@ -3,10 +3,10 @@ package com.franktranvantu.springboot3.controller;
 import com.franktranvantu.springboot3.dto.request.AuthenticationRequest;
 import com.franktranvantu.springboot3.dto.request.IntrospectRequest;
 import com.franktranvantu.springboot3.dto.request.LogoutRequest;
+import com.franktranvantu.springboot3.dto.request.RefreshTokenRequest;
 import com.franktranvantu.springboot3.dto.response.AuthenticationResponse;
 import com.franktranvantu.springboot3.dto.response.IntrospectResponse;
 import com.franktranvantu.springboot3.dto.response.ServiceResponse;
-import com.franktranvantu.springboot3.exception.ServiceStatusCode;
 import com.franktranvantu.springboot3.service.AuthenticationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +26,11 @@ public class AuthenticationController {
     @PostMapping("/token")
     public ServiceResponse<AuthenticationResponse> authenticated(@RequestBody AuthenticationRequest request) {
         return ServiceResponse.ok(authenticationService.authenticated(request));
+    }
+
+    @PostMapping("/refresh")
+    public ServiceResponse<AuthenticationResponse> refresh(@RequestBody RefreshTokenRequest request) {
+        return ServiceResponse.ok(authenticationService.refresh(request));
     }
 
     @PostMapping("/introspect")

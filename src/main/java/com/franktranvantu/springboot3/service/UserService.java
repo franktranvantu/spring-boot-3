@@ -37,17 +37,15 @@ public class UserService {
     RoleMapper roleMapper;
 
     public UserResponse createUser(UserCreationRequest request) {
-        final var userRoles = Set.of(roleRepository.getReferenceById(USER.name()));
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new ServiceException(USER_EXISTED);
         }
+        final var userRoles = Set.of(roleRepository.getReferenceById(USER.name()));
         final var user = userMapper.toUser(request);
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRoles(userRoles);
-        final var userResponse = userMapper.toUserResponse(userRepository.save(user));
-        userResponse.setRoles(userRoles.stream().map(roleMapper::toRoleResponse).collect(Collectors.toSet()));
-        return userResponse;
+        return userMapper.toUserResponse(userRepository.save(user));
     }
 
     public List<UserResponse> getUsers() {
@@ -62,7 +60,7 @@ public class UserService {
         final var user = userRepository.findById(userId).orElseThrow(() -> new ServiceException(USER_NOT_FOUND));
         userMapper.userUpdateRequestToUser(request, user);
         final var roles = roleRepository.findAllById(request.getRoles());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRoles(new HashSet<>(roles));
         return userMapper.toUserResponse(userRepository.save(user));
     }

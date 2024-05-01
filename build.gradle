@@ -33,6 +33,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
     runtimeOnly 'com.mysql:mysql-connector-j'
+    testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
@@ -43,4 +44,8 @@ compileJava {
             "-Amapstruct.defaultComponentModel=spring",
             "-Amapstruct.verbose=true"
     ]
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }
