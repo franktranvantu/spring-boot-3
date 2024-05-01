@@ -16,11 +16,3 @@ spring:
 
 jwt:
   signerKey: "gTWFWOUfj5ujOpkXxZziYEC0r6tiyvasmwjicIZ6ER+pTMk3gFk2Uljx7tztIh0y"
-  tokens:
-    adminToken: <token>
-    user1Token: <token>
-    user2Token: <token>
-    invalidToken: <token>
-params:
-  user1Id: "95b81180-10db-4994-aa2b-4ccbdbdc6af7"
-  user2Id: "75707056-0ab2-45d2-a912-5e15f068c94a"

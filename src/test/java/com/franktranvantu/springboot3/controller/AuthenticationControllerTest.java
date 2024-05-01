@@ -20,8 +20,6 @@ class AuthenticationControllerTest {
     @Autowired
     private MockMvc underTest;
     private static ObjectMapper objectMapper = new ObjectMapper();;
-    @Value("${jwt.tokens.invalidToken}")
-    private String invalidToken;
 
     @Test
     void givenValidRequest_whenAuthenticated_then200() throws Exception {
@@ -79,17 +77,5 @@ class AuthenticationControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(4001))
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("You are not authenticated"));
-    }
-
-    @Test
-    void refresh() {
-    }
-
-    @Test
-    void introspect() {
-    }
-
-    @Test
-    void logout() {
     }
 }

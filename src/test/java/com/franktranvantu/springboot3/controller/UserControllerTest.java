@@ -220,16 +220,4 @@ class UserControllerTest {
 
         verify(userService).getUser(user1Id);
     }
-
-    @Test
-    void updateUser() {
-    }
-
-    @Test
-    void deleteUser() {
-    }
-
-    @Test
-    void getMyInfo() {
-    }
 }

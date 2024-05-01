@@ -8,6 +8,7 @@ import com.franktranvantu.springboot3.exception.ServiceException;
 import com.franktranvantu.springboot3.mapper.UserMapper;
 import com.franktranvantu.springboot3.repository.RoleRepository;
 import com.franktranvantu.springboot3.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,6 +40,12 @@ class UserServiceTest {
     private RoleRepository roleRepository;
     @MockBean
     private UserRepository userRepository;
+
+    @BeforeEach
+    protected void setUp() {
+        reset(roleRepository);
+        reset(userRepository);
+    }
 
     @Test
     void givenValidRequest_whenCreateUser_thenSuccess() {
@@ -90,25 +98,5 @@ class UserServiceTest {
         verify(userRepository).existsByUsername(request.getUsername());
         verify(roleRepository, never()).getReferenceById(USER.name());
         verify(userRepository, never()).save(any(User.class));
-    }
-
-    @Test
-    void getUsers() {
-    }
-
-    @Test
-    void getUser() {
-    }
-
-    @Test
-    void updateUser() {
-    }
-
-    @Test
-    void deleteUser() {
-    }
-
-    @Test
-    void getMyInfo() {
     }
 }

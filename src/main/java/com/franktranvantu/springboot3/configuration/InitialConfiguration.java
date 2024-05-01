@@ -4,7 +4,6 @@ import com.franktranvantu.springboot3.entity.User;
 import com.franktranvantu.springboot3.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,11 +14,6 @@ import java.time.LocalDate;
 @Slf4j
 public class InitialConfiguration {
     @Bean
-    @ConditionalOnProperty(
-            prefix = "spring",
-            value = "datasource.driverClassName",
-            havingValue = "com.mysql.cj.jdbc.Driver"
-    )
     public ApplicationRunner runner(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder
