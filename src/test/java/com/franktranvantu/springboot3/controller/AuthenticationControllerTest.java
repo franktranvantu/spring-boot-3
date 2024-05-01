@@ -1,16 +1,17 @@
 package com.franktranvantu.springboot3.controller;
 
-import com.franktranvantu.springboot3.exception.ServiceException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.franktranvantu.springboot3.dto.request.AuthenticationRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -18,31 +19,66 @@ import static org.junit.jupiter.api.Assertions.*;
 class AuthenticationControllerTest {
     @Autowired
     private MockMvc underTest;
+    private static ObjectMapper objectMapper = new ObjectMapper();;
+    @Value("${jwt.tokens.invalidToken}")
+    private String invalidToken;
 
     @Test
-    void givenInvalidToken_whenAuthenticated_then401() {
-        assertThrows(ServiceException.class, () -> underTest
+    void givenValidRequest_whenAuthenticated_then200() throws Exception {
+        final var request = AuthenticationRequest
+                .builder()
+                .username("admin")
+                .password("admin")
+                .build();
+        underTest
                 .perform(
                         MockMvcRequestBuilders
-                                .get("/users")
-                                .header("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwic2NvcGUiOiJST0xFX1VTRVIgQ1JFQVRFX1BPU1QiLCJpc3MiOiJmcmFua3RyYW52YW50dS5jb20iLCJleHAiOjE3MTQ1NzEwNjgsImlhdCI6MTcxNDU2NzQ2OCwianRpIjoiMDhhMGRlMTEtNDNhNC00YjBjLWJkZWYtNTZhMjM1ZDU2OGVhIn0.rtE1Kf2drQSNxMWX0FrKbIZl6SXIOCNuDLWk2fqo6Fqn283dFyi0BUtl9q6WhSdJB-5qgd_dtPrWq5bAuyrd-A")
+                                .post("/auth/token")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsBytes(request))
                 )
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
-                .andExpect(MockMvcResultMatchers.jsonPath("code").value(4001))
-                .andExpect(MockMvcResultMatchers.jsonPath("message").value("You are not authenticated")));
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(2000))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.authenticated").value(true))
+                .andExpect(MockMvcResultMatchers.jsonPath("result.token").isNotEmpty());
     }
 
     @Test
-    void givenUnparsedToken_whenAuthenticated_then500() {
-        assertThrows(ServiceException.class, () -> underTest
+    void givenInvalidUsernameRequest_whenAuthenticated_then404() throws Exception {
+        final var request = AuthenticationRequest
+                .builder()
+                .username("ad")
+                .password("admin")
+                .build();
+        underTest
                 .perform(
                         MockMvcRequestBuilders
-                                .get("/users")
-                                .header("Authorization", "Bearer Abc")
+                                .post("/auth/token")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsBytes(request))
                 )
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
-                .andExpect(MockMvcResultMatchers.jsonPath("code").value(9998))
-                .andExpect(MockMvcResultMatchers.jsonPath("message").value("The token is invalid")));
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(4103))
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("The user not found"));
+    }
+
+    @Test
+    void givenInvalidPasswordRequest_whenAuthenticated_then401() throws Exception {
+        final var request = AuthenticationRequest
+                .builder()
+                .username("admin")
+                .password("pass")
+                .build();
+        underTest
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/auth/token")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsBytes(request))
+                )
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(4001))
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("You are not authenticated"));
     }
 
     @Test

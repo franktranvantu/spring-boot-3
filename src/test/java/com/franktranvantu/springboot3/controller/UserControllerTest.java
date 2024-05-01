@@ -29,21 +29,22 @@ import static org.mockito.Mockito.when;
 @AutoConfigureMockMvc
 @ActiveProfiles("unit-test")
 class UserControllerTest {
-    private static ObjectMapper objectMapper;
-    @Value("${jwt.adminToken}")
-    private String adminToken;
-    @Value("${jwt.user1Token}")
-    private String user1Token;
-    @Value("${jwt.user2Token}")
-    private String user2Token;
-    @Value("${user1Id}")
-    private String user1Id;
-    @Value("${user2Id}")
-    private String user2Id;
     @Autowired
     private MockMvc underTest;
     @MockBean
+    @Autowired
     private UserService userService;
+    private static ObjectMapper objectMapper;
+    @Value("${jwt.tokens.adminToken}")
+    private String adminToken;
+    @Value("${jwt.tokens.user1Token}")
+    private String user1Token;
+    @Value("${jwt.tokens.user2Token}")
+    private String user2Token;
+    @Value("${params.user1Id}")
+    private String user1Id;
+    @Value("${params.user2Id}")
+    private String user2Id;
 
     @BeforeAll
     protected static void beforeAll() {

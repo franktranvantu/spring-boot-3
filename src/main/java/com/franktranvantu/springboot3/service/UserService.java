@@ -4,7 +4,6 @@ import com.franktranvantu.springboot3.dto.request.UserCreationRequest;
 import com.franktranvantu.springboot3.dto.request.UserUpdateRequest;
 import com.franktranvantu.springboot3.dto.response.UserResponse;
 import com.franktranvantu.springboot3.exception.ServiceException;
-import com.franktranvantu.springboot3.mapper.RoleMapper;
 import com.franktranvantu.springboot3.mapper.UserMapper;
 import com.franktranvantu.springboot3.repository.RoleRepository;
 import com.franktranvantu.springboot3.repository.UserRepository;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.franktranvantu.springboot3.enums.Role.USER;
 import static com.franktranvantu.springboot3.exception.ServiceStatusCode.USER_EXISTED;
@@ -34,7 +32,6 @@ public class UserService {
     RoleRepository roleRepository;
     UserRepository userRepository;
     UserMapper userMapper;
-    RoleMapper roleMapper;
 
     public UserResponse createUser(UserCreationRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
