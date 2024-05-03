@@ -8,11 +8,11 @@ import com.franktranvantu.springboot3.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -35,16 +35,6 @@ class UserControllerTest {
     @Autowired
     private UserService userService;
     private static ObjectMapper objectMapper;
-    @Value("${jwt.tokens.adminToken}")
-    private String adminToken;
-    @Value("${jwt.tokens.user1Token}")
-    private String user1Token;
-    @Value("${jwt.tokens.user2Token}")
-    private String user2Token;
-    @Value("${params.user1Id}")
-    private String user1Id;
-    @Value("${params.user2Id}")
-    private String user2Id;
 
     @BeforeAll
     protected static void beforeAll() {
@@ -143,12 +133,12 @@ class UserControllerTest {
     }
 
     @Test
-    void givenAdminToken_whenGetUsers_then200() throws Exception {
+    @WithMockUser(roles = {"ADMIN"})
+    void givenAdminRequest_whenGetUsers_then200() throws Exception {
         underTest
                 .perform(
                         MockMvcRequestBuilders
                                 .get("/users")
-                                .header("Authorization", adminToken)
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(2000));
@@ -157,12 +147,12 @@ class UserControllerTest {
     }
 
     @Test
-    void givenUser1Token_whenGetUsers_then403() throws Exception {
+    @WithMockUser()
+    void givenUser_whenGetUsers_then403() throws Exception {
         underTest
                 .perform(
                         MockMvcRequestBuilders
                                 .get("/users")
-                                .header("Authorization", user1Token)
                 )
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(4003))
@@ -174,50 +164,50 @@ class UserControllerTest {
 
 
     @Test
-    void givenAdminToken_whenGetUser_then200() throws Exception {
-        when(userService.getUser(user1Id)).thenReturn(UserResponse.builder().username("user1").build());
+    @WithMockUser(roles = {"ADMIN"})
+    void givenAdminRequest_whenGetUser_then200() throws Exception {
+        when(userService.getUser("user1Id")).thenReturn(UserResponse.builder().username("user1").build());
 
         underTest
                 .perform(
                         MockMvcRequestBuilders
-                                .get("/users/{userId}", user1Id)
-                                .header("Authorization", adminToken)
+                                .get("/users/{userId}", "user1Id")
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(2000));
 
-        verify(userService).getUser(user1Id);
+        verify(userService).getUser("user1Id");
     }
 
     @Test
-    void givenUser1Token_whenGetUser_then200() throws Exception {
-        when(userService.getUser(user1Id)).thenReturn(UserResponse.builder().username("user1").build());
+    @WithMockUser(username = "user1")
+    void givenUserRequest_whenGetUser_then200() throws Exception {
+        when(userService.getUser("user1Id")).thenReturn(UserResponse.builder().username("user1").build());
 
         underTest
                 .perform(
                         MockMvcRequestBuilders
-                                .get("/users/{userId}", user1Id)
-                                .header("Authorization", user1Token)
+                                .get("/users/{userId}", "user1Id")
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(2000));
 
-        verify(userService).getUser(user1Id);
+        verify(userService).getUser("user1Id");
     }
 
     @Test
-    void givenUser2Token_whenGetUser_then403() throws Exception {
-        when(userService.getUser(user1Id)).thenReturn(UserResponse.builder().username("user1").build());
+    @WithMockUser(username = "user2")
+    void givenUserRequest_whenGetUser_then403() throws Exception {
+        when(userService.getUser("user1Id")).thenReturn(UserResponse.builder().username("user1").build());
 
         underTest
                 .perform(
                         MockMvcRequestBuilders
-                                .get("/users/{userId}", user1Id)
-                                .header("Authorization", user2Token)
+                                .get("/users/{userId}", "user1Id")
                 )
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(4003));
 
-        verify(userService).getUser(user1Id);
+        verify(userService).getUser("user1Id");
     }
 }
