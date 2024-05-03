@@ -1,22 +1,19 @@
 package com.franktranvantu.springboot3.service;
 
+import static com.franktranvantu.springboot3.exception.ServiceStatusCode.PERMISSION_EXISTED;
+import static com.franktranvantu.springboot3.exception.ServiceStatusCode.PERMISSION_NOT_FOUND;
+
 import com.franktranvantu.springboot3.dto.request.PermissionRequest;
 import com.franktranvantu.springboot3.dto.response.PermissionResponse;
 import com.franktranvantu.springboot3.exception.ServiceException;
 import com.franktranvantu.springboot3.mapper.PermissionMapper;
 import com.franktranvantu.springboot3.repository.PermissionRepository;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.List;
-
-import static com.franktranvantu.springboot3.exception.ServiceStatusCode.PERMISSION_EXISTED;
-import static com.franktranvantu.springboot3.exception.ServiceStatusCode.PERMISSION_NOT_FOUND;
-import static com.franktranvantu.springboot3.exception.ServiceStatusCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -35,8 +32,9 @@ public class PermissionService {
     }
 
     public List<PermissionResponse> getPermissions() {
-        return permissionRepository.findAll().stream().map(permissionMapper::toPermissionResponse).toList();
-
+        return permissionRepository.findAll().stream()
+                .map(permissionMapper::toPermissionResponse)
+                .toList();
     }
 
     public PermissionResponse getPermission(String permissionName) {
@@ -47,7 +45,9 @@ public class PermissionService {
     }
 
     public PermissionResponse updatePermission(String permissionName, PermissionRequest request) {
-        final var permission = permissionRepository.findById(permissionName).orElseThrow(() -> new ServiceException(PERMISSION_NOT_FOUND));
+        final var permission = permissionRepository
+                .findById(permissionName)
+                .orElseThrow(() -> new ServiceException(PERMISSION_NOT_FOUND));
         permissionMapper.permissionUpdateRequestToPermission(request, permission);
         return permissionMapper.toPermissionResponse(permissionRepository.save(permission));
     }

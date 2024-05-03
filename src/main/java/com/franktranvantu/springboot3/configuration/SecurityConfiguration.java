@@ -23,27 +23,20 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SecurityConfiguration {
-    static String[] PUBLIC_ENDPOINTS = {
-            "/users",
-            "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"
-    };
+    static String[] PUBLIC_ENDPOINTS = {"/users", "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"};
     AuthenticationEntryPoint authenticationEntryPoint;
     JwtDecoder jwtDecoder;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(request -> request
-                .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-                .anyRequest().authenticated()
-        );
+        httpSecurity.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
+                .permitAll()
+                .anyRequest()
+                .authenticated());
         httpSecurity.csrf(csrf -> csrf.disable());
         httpSecurity.oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer
-                .jwt(jwt -> jwt
-                        .decoder(jwtDecoder)
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                )
-                .authenticationEntryPoint(authenticationEntryPoint)
-        );
+                .jwt(jwt -> jwt.decoder(jwtDecoder).jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                .authenticationEntryPoint(authenticationEntryPoint));
         return httpSecurity.build();
     }
 
@@ -60,5 +53,4 @@ public class SecurityConfiguration {
     public PasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder(10);
     }
-
 }

@@ -1,13 +1,12 @@
 package com.franktranvantu.springboot3.validator;
 
+import static lombok.AccessLevel.PRIVATE;
+
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import lombok.experimental.FieldDefaults;
-
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-
-import static lombok.AccessLevel.PRIVATE;
+import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = PRIVATE)
 public class BirthdateValidator implements ConstraintValidator<Birthdate, LocalDate> {

@@ -1,5 +1,7 @@
 package com.franktranvantu.springboot3.dto.response;
 
+import static com.franktranvantu.springboot3.exception.ServiceStatusCode.SUCCESS;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -7,8 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
-import static com.franktranvantu.springboot3.exception.ServiceStatusCode.SUCCESS;
 
 @Data
 @Builder
@@ -29,8 +29,6 @@ public class ServiceResponse<T> {
     }
 
     public static ServiceResponse ok() {
-        return ServiceResponse.<Void>builder()
-                .code(SUCCESS.getCode())
-                .build();
+        return ServiceResponse.<Void>builder().code(SUCCESS.getCode()).build();
     }
 }

@@ -1,5 +1,9 @@
 package com.franktranvantu.springboot3.service;
 
+import static com.franktranvantu.springboot3.enums.Role.USER;
+import static com.franktranvantu.springboot3.exception.ServiceStatusCode.USER_EXISTED;
+import static com.franktranvantu.springboot3.exception.ServiceStatusCode.USER_NOT_FOUND;
+
 import com.franktranvantu.springboot3.dto.request.UserCreationRequest;
 import com.franktranvantu.springboot3.dto.request.UserUpdateRequest;
 import com.franktranvantu.springboot3.dto.response.UserResponse;
@@ -7,6 +11,9 @@ import com.franktranvantu.springboot3.exception.ServiceException;
 import com.franktranvantu.springboot3.mapper.UserMapper;
 import com.franktranvantu.springboot3.repository.RoleRepository;
 import com.franktranvantu.springboot3.repository.UserRepository;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -14,14 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static com.franktranvantu.springboot3.enums.Role.USER;
-import static com.franktranvantu.springboot3.exception.ServiceStatusCode.USER_EXISTED;
-import static com.franktranvantu.springboot3.exception.ServiceStatusCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -72,6 +71,7 @@ public class UserService {
     public UserResponse getMyInfo() {
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
         final var username = authentication.getName();
-        return userMapper.toUserResponse(userRepository.findUserByUsername(username).orElseThrow(() -> new ServiceException(USER_NOT_FOUND)));
+        return userMapper.toUserResponse(
+                userRepository.findUserByUsername(username).orElseThrow(() -> new ServiceException(USER_NOT_FOUND)));
     }
 }

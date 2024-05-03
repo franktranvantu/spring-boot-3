@@ -1,5 +1,9 @@
 package com.franktranvantu.springboot3.service;
 
+import static com.franktranvantu.springboot3.exception.ServiceStatusCode.INVALID_TOKEN;
+import static com.franktranvantu.springboot3.exception.ServiceStatusCode.UNAUTHENTICATED;
+import static com.franktranvantu.springboot3.exception.ServiceStatusCode.USER_NOT_FOUND;
+
 import com.franktranvantu.springboot3.dto.request.AuthenticationRequest;
 import com.franktranvantu.springboot3.dto.request.IntrospectRequest;
 import com.franktranvantu.springboot3.dto.request.LogoutRequest;
@@ -21,6 +25,12 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.UUID;
+import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,17 +40,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.UUID;
-import java.util.stream.Stream;
-
-import static com.franktranvantu.springboot3.exception.ServiceStatusCode.INVALID_TOKEN;
-import static com.franktranvantu.springboot3.exception.ServiceStatusCode.UNAUTHENTICATED;
-import static com.franktranvantu.springboot3.exception.ServiceStatusCode.USER_NOT_FOUND;
-
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -49,12 +48,15 @@ public class AuthenticationService {
     @Value("${jwt.signerKey}")
     @NonFinal
     String signerKey;
+
     UserRepository userRepository;
     InvalidatedTokenRepository invalidatedTokenRepository;
 
     public AuthenticationResponse authenticated(AuthenticationRequest request) {
         final var passwordEncoder = new BCryptPasswordEncoder(10);
-        final var user = userRepository.findUserByUsername(request.getUsername()).orElseThrow(() -> new ServiceException(USER_NOT_FOUND));
+        final var user = userRepository
+                .findUserByUsername(request.getUsername())
+                .orElseThrow(() -> new ServiceException(USER_NOT_FOUND));
         final var authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
         if (!authenticated) {
             throw new ServiceException(UNAUTHENTICATED);
@@ -68,11 +70,15 @@ public class AuthenticationService {
     public String generateJwtToken(User user) {
         final var header = new JWSHeader(JWSAlgorithm.HS512);
         final var roles = user.getRoles().stream().map(role -> "ROLE_" + role.getName());
-        final var permissions = user.getRoles().stream().flatMap(role -> role.getPermissions().stream()).map(Permission::getName);
+        final var permissions = user.getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(Permission::getName);
         final var claimsSet = new JWTClaimsSet.Builder()
                 .jwtID(UUID.randomUUID().toString())
                 .subject(user.getUsername())
-                .claim("scope", String.join(" ", Stream.concat(roles, permissions).toList()))
+                .claim(
+                        "scope",
+                        String.join(" ", Stream.concat(roles, permissions).toList()))
                 .issuer("franktranvantu.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
@@ -95,9 +101,7 @@ public class AuthenticationService {
         } catch (ServiceException e) {
             isValid = false;
         }
-        return IntrospectResponse.builder()
-                .valid(isValid)
-                .build();
+        return IntrospectResponse.builder().valid(isValid).build();
     }
 
     private SignedJWT verifyToken(String token) {
@@ -105,12 +109,14 @@ public class AuthenticationService {
             final MACVerifier verifier = new MACVerifier(signerKey.getBytes());
             final var signedJWT = SignedJWT.parse(token);
             final var validSigned = signedJWT.verify(verifier);
-            final var validExpirationTime = signedJWT.getJWTClaimsSet().getExpirationTime().after(new Date());
+            final var validExpirationTime =
+                    signedJWT.getJWTClaimsSet().getExpirationTime().after(new Date());
             final var valid = validSigned && validExpirationTime;
             if (!valid) {
                 throw new ServiceException(INVALID_TOKEN);
             }
-            final var isLoggedOutToken = invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID());
+            final var isLoggedOutToken = invalidatedTokenRepository.existsById(
+                    signedJWT.getJWTClaimsSet().getJWTID());
             if (isLoggedOutToken) {
                 throw new ServiceException(UNAUTHENTICATED);
             }
@@ -131,7 +137,8 @@ public class AuthenticationService {
             final var signedJWT = verifyToken(request.getToken());
             invalidateToken(signedJWT);
             final var username = signedJWT.getJWTClaimsSet().getSubject();
-            final var user = userRepository.findUserByUsername(username).orElseThrow(() -> new ServiceException(USER_NOT_FOUND));
+            final var user =
+                    userRepository.findUserByUsername(username).orElseThrow(() -> new ServiceException(USER_NOT_FOUND));
             return AuthenticationResponse.builder()
                     .authenticated(true)
                     .token(generateJwtToken(user))

@@ -1,24 +1,5 @@
 package com.franktranvantu.springboot3.service;
 
-import com.franktranvantu.springboot3.dto.request.UserCreationRequest;
-import com.franktranvantu.springboot3.entity.Permission;
-import com.franktranvantu.springboot3.entity.Role;
-import com.franktranvantu.springboot3.entity.User;
-import com.franktranvantu.springboot3.exception.ServiceException;
-import com.franktranvantu.springboot3.mapper.UserMapper;
-import com.franktranvantu.springboot3.repository.RoleRepository;
-import com.franktranvantu.springboot3.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.context.TestPropertySource;
-
-import java.time.LocalDate;
-import java.util.Set;
-
 import static com.franktranvantu.springboot3.enums.Role.USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -29,15 +10,36 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.franktranvantu.springboot3.dto.request.UserCreationRequest;
+import com.franktranvantu.springboot3.entity.Permission;
+import com.franktranvantu.springboot3.entity.Role;
+import com.franktranvantu.springboot3.entity.User;
+import com.franktranvantu.springboot3.exception.ServiceException;
+import com.franktranvantu.springboot3.mapper.UserMapper;
+import com.franktranvantu.springboot3.repository.RoleRepository;
+import com.franktranvantu.springboot3.repository.UserRepository;
+import java.time.LocalDate;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.context.TestPropertySource;
+
 @SpringBootTest
 @TestPropertySource("/unit-test.properties")
 class UserServiceTest {
     @Autowired
     private UserService underTest;
+
     @Autowired
     private UserMapper userMapper;
+
     @MockBean
     private RoleRepository roleRepository;
+
     @MockBean
     private UserRepository userRepository;
 
@@ -49,27 +51,20 @@ class UserServiceTest {
 
     @Test
     void givenValidRequest_whenCreateUser_thenSuccess() {
-        final var request = UserCreationRequest
-                .builder()
+        final var request = UserCreationRequest.builder()
                 .username("user1")
                 .password("pass")
                 .dob(LocalDate.of(1990, 1, 1))
                 .build();
-        final var user = User
-                .builder()
+        final var user = User.builder()
                 .id("82947101-aef8-46a1-8e94-990d658a5694")
                 .username("user1")
                 .dateOfBirth(LocalDate.of(1990, 1, 1))
-                .roles(Set.of(
-                        Role.builder()
-                            .name("USER")
-                            .permissions(Set.of(
-                                Permission.builder()
-                                    .name("CREATE_POST")
-                                    .build()
-                            ))
-                        .build()
-                ))
+                .roles(Set.of(Role.builder()
+                        .name("USER")
+                        .permissions(
+                                Set.of(Permission.builder().name("CREATE_POST").build()))
+                        .build()))
                 .build();
         when(userRepository.existsByUsername(request.getUsername())).thenReturn(false);
         when(roleRepository.getReferenceById(USER.name())).thenReturn(mock(Role.class));
@@ -85,12 +80,11 @@ class UserServiceTest {
 
     @Test
     void givenExistedUserRequest_whenCreateUser_thenFail() {
-        final var request = UserCreationRequest
-                .builder()
-                .build();
+        final var request = UserCreationRequest.builder().build();
         when(userRepository.existsByUsername(request.getUsername())).thenReturn(true);
 
-        final var serviceStatusCode = assertThrows(ServiceException.class, () -> underTest.createUser(request)).getServiceStatusCode();
+        final var serviceStatusCode = assertThrows(ServiceException.class, () -> underTest.createUser(request))
+                .getServiceStatusCode();
 
         assertThat(serviceStatusCode.getCode()).isEqualTo(4102);
         assertThat(serviceStatusCode.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

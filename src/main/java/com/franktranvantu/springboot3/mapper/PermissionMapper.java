@@ -10,7 +10,10 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface PermissionMapper {
     Permission toPermission(PermissionRequest dto);
+
     Permission toPermission(PermissionResponse dto);
+
     PermissionResponse toPermissionResponse(Permission entity);
+
     void permissionUpdateRequestToPermission(PermissionRequest dto, @MappingTarget Permission entity);
 }

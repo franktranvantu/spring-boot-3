@@ -6,6 +6,7 @@ import com.franktranvantu.springboot3.dto.response.ServiceResponse;
 import com.franktranvantu.springboot3.dto.response.UserResponse;
 import com.franktranvantu.springboot3.service.UserService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,8 +20,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -48,7 +47,8 @@ public class UserController {
 
     @PutMapping("/{userId}")
     @PostAuthorize("returnObject.result.username == authentication.name || hasRole('ADMIN')")
-    public ServiceResponse<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
+    public ServiceResponse<UserResponse> updateUser(
+            @PathVariable String userId, @RequestBody UserUpdateRequest request) {
         return ServiceResponse.ok(userService.updateUser(userId, request));
     }
 

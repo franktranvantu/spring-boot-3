@@ -1,15 +1,15 @@
 package com.franktranvantu.springboot3.exception;
 
+import static com.franktranvantu.springboot3.exception.ServiceStatusCode.UNAUTHORIZED;
+import static com.franktranvantu.springboot3.exception.ServiceStatusCode.UNEXPECTED_ERROR;
+import static com.franktranvantu.springboot3.exception.ServiceStatusCode.USER_INVALID_REQUEST;
+
 import com.franktranvantu.springboot3.dto.response.ServiceResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import static com.franktranvantu.springboot3.exception.ServiceStatusCode.UNAUTHORIZED;
-import static com.franktranvantu.springboot3.exception.ServiceStatusCode.UNEXPECTED_ERROR;
-import static com.franktranvantu.springboot3.exception.ServiceStatusCode.USER_INVALID_REQUEST;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -29,11 +29,13 @@ public class GlobalExceptionHandler {
                 .code(exception.getServiceStatusCode().getCode())
                 .message(exception.getServiceStatusCode().getMessage())
                 .build();
-        return ResponseEntity.status(exception.getServiceStatusCode().getStatusCode()).body(serviceResponse);
+        return ResponseEntity.status(exception.getServiceStatusCode().getStatusCode())
+                .body(serviceResponse);
     }
 
     @ExceptionHandler
-    public ResponseEntity<ServiceResponse> handlingMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+    public ResponseEntity<ServiceResponse> handlingMethodArgumentNotValidException(
+            MethodArgumentNotValidException exception) {
         final var serviceResponse = ServiceResponse.builder()
                 .code(USER_INVALID_REQUEST.getCode())
                 .message(exception.getFieldError().getDefaultMessage())

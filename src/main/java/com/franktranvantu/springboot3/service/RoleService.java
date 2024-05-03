@@ -1,22 +1,21 @@
 package com.franktranvantu.springboot3.service;
 
+import static com.franktranvantu.springboot3.exception.ServiceStatusCode.PERMISSION_EXISTED;
+import static com.franktranvantu.springboot3.exception.ServiceStatusCode.ROLE_NOT_FOUND;
+
 import com.franktranvantu.springboot3.dto.request.RoleRequest;
 import com.franktranvantu.springboot3.dto.response.RoleResponse;
 import com.franktranvantu.springboot3.exception.ServiceException;
 import com.franktranvantu.springboot3.mapper.RoleMapper;
 import com.franktranvantu.springboot3.repository.PermissionRepository;
 import com.franktranvantu.springboot3.repository.RoleRepository;
+import java.util.HashSet;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.List;
-
-import static com.franktranvantu.springboot3.exception.ServiceStatusCode.PERMISSION_EXISTED;
-import static com.franktranvantu.springboot3.exception.ServiceStatusCode.ROLE_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

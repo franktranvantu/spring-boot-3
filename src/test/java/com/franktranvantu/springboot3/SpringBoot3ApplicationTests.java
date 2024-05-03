@@ -9,7 +9,5 @@ import org.springframework.test.context.TestPropertySource;
 class SpringBoot3ApplicationTests {
 
     @Test
-    void contextLoads() {
-    }
-
+    void contextLoads() {}
 }

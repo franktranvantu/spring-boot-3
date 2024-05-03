@@ -4,6 +4,7 @@ import com.franktranvantu.springboot3.dto.request.RoleRequest;
 import com.franktranvantu.springboot3.dto.response.RoleResponse;
 import com.franktranvantu.springboot3.dto.response.ServiceResponse;
 import com.franktranvantu.springboot3.service.RoleService;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -15,8 +16,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/roles")

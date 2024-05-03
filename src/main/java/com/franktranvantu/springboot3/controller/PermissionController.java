@@ -4,6 +4,7 @@ import com.franktranvantu.springboot3.dto.request.PermissionRequest;
 import com.franktranvantu.springboot3.dto.response.PermissionResponse;
 import com.franktranvantu.springboot3.dto.response.ServiceResponse;
 import com.franktranvantu.springboot3.service.PermissionService;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -15,8 +16,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/permissions")
@@ -41,7 +40,8 @@ public class PermissionController {
     }
 
     @PutMapping("/{permissionName}")
-    public ServiceResponse<PermissionResponse> updatePermission(@PathVariable String permissionName, @RequestBody PermissionRequest request) {
+    public ServiceResponse<PermissionResponse> updatePermission(
+            @PathVariable String permissionName, @RequestBody PermissionRequest request) {
         return ServiceResponse.ok(permissionService.updatePermission(permissionName, request));
     }
 
