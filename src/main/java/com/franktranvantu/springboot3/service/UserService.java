@@ -1,6 +1,6 @@
 package com.franktranvantu.springboot3.service;
 
-import static com.franktranvantu.springboot3.enums.Role.USER;
+import static com.franktranvantu.springboot3.constant.PredefinedRole.USER_ROLE;
 import static com.franktranvantu.springboot3.exception.ServiceStatusCode.USER_EXISTED;
 import static com.franktranvantu.springboot3.exception.ServiceStatusCode.USER_NOT_FOUND;
 
@@ -36,7 +36,7 @@ public class UserService {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new ServiceException(USER_EXISTED);
         }
-        final var userRoles = Set.of(roleRepository.getReferenceById(USER.name()));
+        final var userRoles = Set.of(roleRepository.getReferenceById(USER_ROLE));
         final var user = userMapper.toUser(request);
 
         user.setPassword(passwordEncoder.encode(request.getPassword()));

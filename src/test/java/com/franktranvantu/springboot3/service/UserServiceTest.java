@@ -1,6 +1,6 @@
 package com.franktranvantu.springboot3.service;
 
-import static com.franktranvantu.springboot3.enums.Role.USER;
+import static com.franktranvantu.springboot3.constant.PredefinedRole.USER_ROLE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,13 +67,13 @@ class UserServiceTest {
                         .build()))
                 .build();
         when(userRepository.existsByUsername(request.getUsername())).thenReturn(false);
-        when(roleRepository.getReferenceById(USER.name())).thenReturn(mock(Role.class));
+        when(roleRepository.getReferenceById(USER_ROLE)).thenReturn(mock(Role.class));
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         final var userResponse = underTest.createUser(request);
 
         verify(userRepository).existsByUsername(request.getUsername());
-        verify(roleRepository).getReferenceById(USER.name());
+        verify(roleRepository).getReferenceById(USER_ROLE);
         verify(userRepository).save(any(User.class));
         assertThat(userResponse).isEqualTo(userMapper.toUserResponse(user));
     }
@@ -90,7 +90,7 @@ class UserServiceTest {
         assertThat(serviceStatusCode.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(serviceStatusCode.getMessage()).isEqualTo("The user already existed");
         verify(userRepository).existsByUsername(request.getUsername());
-        verify(roleRepository, never()).getReferenceById(USER.name());
+        verify(roleRepository, never()).getReferenceById(USER_ROLE);
         verify(userRepository, never()).save(any(User.class));
     }
 }
