@@ -98,3 +98,22 @@ spotless {
         palantirJavaFormat()
     }
 }
+
+sonar {
+    properties {
+        property("sonar.projectKey", "spring-boot-3")
+        property("sonar.login", "sqp_5417d0f35e13b4ef33f3515d2534af6897777b76")
+        property("sonar.host.url", "http://localhost:9000")
+        property("sonar.exclusions", [
+                'com/franktranvantu/springboot3/configuration/**',
+                'com/franktranvantu/springboot3/dto/**',
+                'com/franktranvantu/springboot3/entity/**',
+                'com/franktranvantu/springboot3/enums/**',
+                'com/franktranvantu/springboot3/exeption/**',
+                'com/franktranvantu/springboot3/mapper/**',
+                'com/franktranvantu/springboot3/repository/**',
+                'com/franktranvantu/springboot3/validator/**'
+
+        ])
+    }
+}
