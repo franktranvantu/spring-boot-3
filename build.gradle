@@ -1,10 +1,10 @@
 plugins {
-    id 'java'
-    id 'jacoco'
-    id 'org.springframework.boot' version '3.2.5'
-    id 'io.spring.dependency-management' version '1.1.4'
-    id 'com.diffplug.spotless' version '6.25.0'
-    id 'org.sonarqube' version '3.5.0.2730'
+    id "java"
+    id "jacoco"
+    id "org.springframework.boot" version "${springBootVersion}"
+    id "io.spring.dependency-management" version "${springDependencyManagementVersion}"
+    id "com.diffplug.spotless" version "${spotlessVersion}"
+    id "org.sonarqube" version "${sonarQubeVersion}"
 }
 
 java {
@@ -17,30 +17,33 @@ repositories {
 
 dependencies {
     // Web
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation "org.springframework.boot:spring-boot-starter-web"
     // Jpa
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     // Validation
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation "org.springframework.boot:spring-boot-starter-validation"
     // Lombok
-    compileOnly 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     // Mapstruct
-    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
     // Bcrypt
-    implementation 'org.springframework.security:spring-security-crypto:6.2.4'
+    implementation "org.springframework.security:spring-security-crypto:${springSecurityCryptoVersion}"
     // Security
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
     // JDBC Connector
-    runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly "com.mysql:mysql-connector-j"
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.0'
+    // Starter test
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    // Security test
+    testImplementation "org.springframework.security:spring-security-test"
+    // Jackson converter
+    testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonDatatypeJsr310Version}"
     // H2
-    testImplementation 'com.h2database:h2:2.2.224'
+    testImplementation "com.h2database:h2:${h2DatabaseVersion}"
 }
 
 compileJava {
@@ -52,15 +55,7 @@ compileJava {
     ]
 }
 
-tasks.named('test') {
-    jacoco {
-        excludes = [
-                'com/franktranvantu/springboot3/dto/**',
-                'com/franktranvantu/springboot3/entity/**',
-                'com/franktranvantu/springboot3/mapper/**',
-                'com/franktranvantu/springboot3/configuration/**'
-        ]
-    }
+test {
     useJUnitPlatform()
 }
 
@@ -79,11 +74,22 @@ jacocoTestCoverageVerification {
 }
 
 jacocoTestReport {
-    reports {
-        xml.enabled false
-        html.enabled true
-    }
     dependsOn test
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    'com/franktranvantu/springboot3/configuration/**',
+                    'com/franktranvantu/springboot3/dto/**',
+                    'com/franktranvantu/springboot3/entity/**',
+                    'com/franktranvantu/springboot3/enums/**',
+                    'com/franktranvantu/springboot3/exeption/**',
+                    'com/franktranvantu/springboot3/mapper/**',
+                    'com/franktranvantu/springboot3/repository/**',
+                    'com/franktranvantu/springboot3/validator/**'
+
+            ])
+        }))
+    }
 }
 
 spotless {
