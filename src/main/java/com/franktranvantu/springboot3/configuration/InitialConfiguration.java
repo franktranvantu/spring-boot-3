@@ -60,25 +60,29 @@ public class InitialConfiguration {
                         .password(passwordEncoder.encode("pass"))
                         .firstName("User 1")
                         .dateOfBirth(LocalDate.now())
+                        .roles(Set.of(userRole))
                         .build();
                 final var user2 = User.builder()
                         .username("user2")
                         .password(passwordEncoder.encode("pass"))
                         .firstName("User 2")
                         .dateOfBirth(LocalDate.now())
+                        .roles(Set.of(userRole))
                         .build();
                 final var admin = User.builder()
                         .username("admin")
                         .password(passwordEncoder.encode("admin"))
                         .firstName("Admin")
                         .dateOfBirth(LocalDate.now())
+                        .roles(Set.of(adminRole))
                         .build();
                 userRepository.saveAll(List.of(user1, user2, admin));
                 log.info(
-                        "" + "The application was automatically init various example data for testing purpose as below:"
-                                + "Permissions: CREATE_POST; APPROVE_POST; REJECT_POST"
-                                + "Roles: USER had permission CREATE_POST; ADMIN had permissions CREATE_POST, APPROVE_POST, REJECT_POST"
-                                + "Users: user1/pass had role USER; user2/pass had role USER, admin/admin had role ADMIN");
+                        "" + "\nThe application was automatically init various example data for testing purpose as below:"
+                                + "\n\tPermissions: CREATE_POST; APPROVE_POST; REJECT_POST"
+                                + "\n\tRoles: USER had permission CREATE_POST; ADMIN had permissions CREATE_POST, APPROVE_POST, REJECT_POST"
+                                + "\n\tUsers: user1/pass had role USER; user2/pass had role USER, admin/admin had role ADMIN"
+                );
             }
         };
     }
