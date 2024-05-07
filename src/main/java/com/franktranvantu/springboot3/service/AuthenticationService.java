@@ -48,6 +48,12 @@ public class AuthenticationService {
     @Value("${jwt.signerKey}")
     @NonFinal
     String signerKey;
+    @Value("${jwt.expiration}")
+    @NonFinal
+    Integer jwtExpiration;
+    @Value("${jwt.refresh-expiration}")
+    @NonFinal
+    Integer jwtRefreshExpiration;
 
     UserRepository userRepository;
     InvalidatedTokenRepository invalidatedTokenRepository;
@@ -81,7 +87,7 @@ public class AuthenticationService {
                         String.join(" ", Stream.concat(roles, permissions).toList()))
                 .issuer("franktranvantu.com")
                 .issueTime(new Date())
-                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
+                .expirationTime(new Date(Instant.now().plus(jwtExpiration, ChronoUnit.SECONDS).toEpochMilli()))
                 .build();
         final var payload = new Payload(claimsSet.toJSONObject());
         final var jwsObject = new JWSObject(header, payload);
@@ -97,20 +103,23 @@ public class AuthenticationService {
     public IntrospectResponse introspect(IntrospectRequest request) {
         var isValid = true;
         try {
-            verifyToken(request.getToken());
+            verifyToken(request.getToken(), false);
         } catch (ServiceException e) {
             isValid = false;
         }
         return IntrospectResponse.builder().valid(isValid).build();
     }
 
-    private SignedJWT verifyToken(String token) {
+    private SignedJWT verifyToken(String token, boolean isRefresh) {
         try {
             final MACVerifier verifier = new MACVerifier(signerKey.getBytes());
             final var signedJWT = SignedJWT.parse(token);
             final var validSigned = signedJWT.verify(verifier);
-            final var validExpirationTime =
-                    signedJWT.getJWTClaimsSet().getExpirationTime().after(new Date());
+            final var claimsSet = signedJWT.getJWTClaimsSet();
+            final var expiration = isRefresh
+                    ? new Date(claimsSet.getIssueTime().toInstant().plus(jwtRefreshExpiration, ChronoUnit.SECONDS).toEpochMilli())
+                    : claimsSet.getExpirationTime();
+            final var validExpirationTime = expiration.after(new Date());
             final var valid = validSigned && validExpirationTime;
             if (!valid) {
                 throw new ServiceException(INVALID_TOKEN);
@@ -128,13 +137,13 @@ public class AuthenticationService {
     }
 
     public void logout(LogoutRequest request) {
-        final var signedJWT = verifyToken(request.getToken());
+        final var signedJWT = verifyToken(request.getToken(), true);
         invalidateToken(signedJWT);
     }
 
     public AuthenticationResponse refresh(RefreshTokenRequest request) {
         try {
-            final var signedJWT = verifyToken(request.getToken());
+            final var signedJWT = verifyToken(request.getToken(), true);
             invalidateToken(signedJWT);
             final var username = signedJWT.getJWTClaimsSet().getSubject();
             final var user =
