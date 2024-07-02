@@ -10,7 +10,6 @@ import com.franktranvantu.springboot3.repository.PermissionRepository;
 import com.franktranvantu.springboot3.repository.RoleRepository;
 import com.franktranvantu.springboot3.repository.UserRepository;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
@@ -29,59 +28,74 @@ public class InitialConfiguration {
             RoleRepository roleRepository) {
         return args -> {
             if (userRepository.findUserByUsername("admin").isEmpty()) {
-                final var createPost = Permission.builder()
+                var createPost = Permission.builder()
                         .name("CREATE_POST")
                         .description("The owner of this permission can create the posts")
                         .build();
-                final var approvePost = Permission.builder()
+                var approvePost = Permission.builder()
                         .name("APPROVE_POST")
                         .description("The owner of this permission can approve the posts")
                         .build();
-                final var rejectPost = Permission.builder()
+                var rejectPost = Permission.builder()
                         .name("REJECT_POST")
                         .description("The owner of this permission can reject the posts")
                         .build();
-                permissionRepository.saveAll(List.of(createPost, approvePost, rejectPost));
+                createPost = permissionRepository.save(createPost);
+                approvePost = permissionRepository.save(approvePost);
+                rejectPost = permissionRepository.save(rejectPost);
 
-                final var userRole = Role.builder()
+                var userRole = Role.builder()
                         .name(USER_ROLE)
                         .description("The User role")
                         .permissions(Set.of(createPost))
                         .build();
-                final var adminRole = Role.builder()
+                var adminRole = Role.builder()
                         .name(ADMIN_ROLE)
                         .description("The Admin role")
                         .permissions(Set.of(createPost, approvePost, rejectPost))
                         .build();
-                roleRepository.saveAll(List.of(userRole, adminRole));
+                userRole = roleRepository.save(userRole);
+                adminRole = roleRepository.save(adminRole);
 
-                final var user1 = User.builder()
+                var user1 = User.builder()
                         .username("user1")
                         .password(passwordEncoder.encode("pass"))
                         .firstName("User 1")
                         .dateOfBirth(LocalDate.now())
                         .roles(Set.of(userRole))
                         .build();
-                final var user2 = User.builder()
+                var user2 = User.builder()
                         .username("user2")
                         .password(passwordEncoder.encode("pass"))
                         .firstName("User 2")
                         .dateOfBirth(LocalDate.now())
                         .roles(Set.of(userRole))
                         .build();
-                final var admin = User.builder()
+                var admin = User.builder()
                         .username("admin")
                         .password(passwordEncoder.encode("admin"))
                         .firstName("Admin")
                         .dateOfBirth(LocalDate.now())
                         .roles(Set.of(adminRole))
                         .build();
-                userRepository.saveAll(List.of(user1, user2, admin));
+                user1 = userRepository.save(user1);
+                user2 = userRepository.save(user2);
+                admin = userRepository.save(admin);
+
                 log.info(
                         "" + "\nThe application was automatically init various example data for testing purpose as below:"
-                                + "\n\tPermissions: CREATE_POST; APPROVE_POST; REJECT_POST"
-                                + "\n\tRoles: USER had permission CREATE_POST; ADMIN had permissions CREATE_POST, APPROVE_POST, REJECT_POST"
-                                + "\n\tUsers: user1/pass had role USER; user2/pass had role USER, admin/admin had role ADMIN"
+                                + "\n\tPermissions:"
+                                + "\n\t\tcreatePost: {}"
+                                + "\n\t\tapprovePost: {}"
+                                + "\n\t\trejectPost: {}"
+                                + "\n\tRoles:"
+                                + "\n\t\tuserRole: {}"
+                                + "\n\t\tadminRole: {}"
+                                + "\n\tUsers:"
+                                + "\n\t\tuser1: {}"
+                                + "\n\t\tuser2: {}"
+                                + "\n\t\tadmin: {}"
+                        , createPost, approvePost, rejectPost, userRole, adminRole, user1, user2, admin
                 );
             }
         };

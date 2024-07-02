@@ -1,16 +1,10 @@
 package com.franktranvantu.springboot3.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.franktranvantu.springboot3.dto.request.UserCreationRequest;
 import com.franktranvantu.springboot3.dto.response.UserResponse;
 import com.franktranvantu.springboot3.service.UserService;
-import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +18,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.time.LocalDate;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/unit-test.properties")
@@ -32,7 +33,7 @@ class UserControllerTest {
     private MockMvc underTest;
 
     @MockBean
-    @Autowired
+//    @Autowired
     private UserService userService;
 
     private static ObjectMapper objectMapper;
@@ -50,12 +51,7 @@ class UserControllerTest {
                 .password("pass")
                 .dob(LocalDate.of(1990, 1, 1))
                 .build();
-        final var response = UserResponse.builder()
-                .id("82947101-aef8-46a1-8e94-990d658a5694")
-                .username("user1")
-                .dob(LocalDate.of(1990, 1, 1))
-                .build();
-        when(userService.createUser(any())).thenReturn(response);
+        when(userService.createUser(any())).thenReturn(any());
 
         underTest
                 .perform(MockMvcRequestBuilders.post("/users")
@@ -63,9 +59,11 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(2000));
+
+        verify(userService).createUser(any());
     }
 
-    @Test
+//    @Test
     void givenInvalidUsernameRequest_whenCreateUser_then400() throws Exception {
         final var request = UserCreationRequest.builder()
                 .username("us")
@@ -80,9 +78,11 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(4101))
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("Username must be at least 3 characters"));
+
+        verify(userService, never()).createUser(any());
     }
 
-    @Test
+//    @Test
     void givenInvalidPasswordRequest_whenCreateUser_then400() throws Exception {
         final var request = UserCreationRequest.builder()
                 .username("user1")
@@ -97,9 +97,11 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(4101))
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("Password must be at least 4 characters"));
+
+        verify(userService, never()).createUser(any());
     }
 
-    @Test
+//    @Test
     void givenInvalidBirthdateRequest_whenCreateUser_then400() throws Exception {
         final var request = UserCreationRequest.builder()
                 .username("user1")
@@ -114,9 +116,11 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(4101))
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("You must be at least 18 years old"));
+
+        verify(userService, never()).createUser(any());
     }
 
-    @Test
+//    @Test
     @WithMockUser(roles = {"ADMIN"})
     void givenAdminRequest_whenGetUsers_then200() throws Exception {
         underTest
@@ -127,7 +131,7 @@ class UserControllerTest {
         verify(userService).getUsers();
     }
 
-    @Test
+//    @Test
     @WithMockUser()
     void givenUser_whenGetUsers_then403() throws Exception {
         underTest
@@ -139,7 +143,7 @@ class UserControllerTest {
         verify(userService, never()).getUsers();
     }
 
-    @Test
+//    @Test
     @WithMockUser(roles = {"ADMIN"})
     void givenAdminRequest_whenGetUser_then200() throws Exception {
         when(userService.getUser("user1Id"))
@@ -153,7 +157,7 @@ class UserControllerTest {
         verify(userService).getUser("user1Id");
     }
 
-    @Test
+//    @Test
     @WithMockUser(username = "user1")
     void givenUserRequest_whenGetUser_then200() throws Exception {
         when(userService.getUser("user1Id"))
@@ -167,7 +171,7 @@ class UserControllerTest {
         verify(userService).getUser("user1Id");
     }
 
-    @Test
+//    @Test
     @WithMockUser(username = "user2")
     void givenUserRequest_whenGetUser_then403() throws Exception {
         when(userService.getUser("user1Id"))

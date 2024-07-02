@@ -35,6 +35,10 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
     // JDBC Connector
     runtimeOnly "com.mysql:mysql-connector-j"
+    // Test containers
+    implementation platform("org.testcontainers:testcontainers-bom:${testContainers}")
+    testImplementation "org.testcontainers:mysql"
+    testImplementation "org.testcontainers:junit-jupiter"
 
     // Starter test
     testImplementation "org.springframework.boot:spring-boot-starter-test"
